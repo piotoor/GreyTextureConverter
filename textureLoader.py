@@ -1,7 +1,10 @@
+#! /c/c64dev/projects/textureLoader/venv/Scripts/python.exe
 from PIL import Image
 import numpy as np
 import os
 import argparse
+
+DST_EXTENSION = ".asm"
 
 
 def convert_image_to_asm_code(input_img, full_size=False):
@@ -14,7 +17,7 @@ def save_image_to_asm_files(file_path, full_size=False):
     print("Processing {}".format(file_path))
     curr_img = Image.open(file_path)
     head, tail = os.path.splitext(file_path)
-    asm_file_path = head + ".asm"
+    asm_file_path = head + DST_EXTENSION
     with open(asm_file_path, 'w') as asm_file:
         asm_file.write("\n".join(convert_image_to_asm_code(curr_img, full_size)))
 
