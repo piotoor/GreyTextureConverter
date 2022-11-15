@@ -35,7 +35,7 @@ if __name__ == '__main__':
     parser.add_argument('path',
                         type=str)
     args = parser.parse_args()
-    print(args.path)
+
     if args.single:
         save_image_to_asm_files(args.path)
     else:
