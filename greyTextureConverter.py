@@ -7,22 +7,23 @@ import argparse
 DST_EXTENSION = ".asm"
 
 
-def convert_image_to_asm_code(input_img, full_size=False):
+def convert_image_to_asm_code(input_img, full_size):
     pixels = np.transpose(np.array(list(input_img.getdata())).reshape((25 if full_size else 13, 16)))
-    asm_code_lines = ["byte " + ", ".join(map(str, x[:13])) for x in pixels]
+    asm_code_lines = ["\tbyte " + ", ".join(map(str, x[:13])) for x in pixels]
     return asm_code_lines
 
 
-def save_image_to_asm_files(file_path, full_size=False):
+def save_image_to_asm_files(file_path, full_size):
     print("Processing {}".format(file_path))
     curr_img = Image.open(file_path)
-    head, tail = os.path.splitext(file_path)
-    asm_file_path = head + DST_EXTENSION
+    head, tail = os.path.split(file_path)
+    src_file_name, ext = os.path.splitext(tail)
+    asm_file_path = os.path.join(head, "..", src_file_name) + DST_EXTENSION
     with open(asm_file_path, 'w') as asm_file:
         asm_file.write("\n".join(convert_image_to_asm_code(curr_img, full_size)))
 
 
-def save_images_to_asm_files(textures_dir, extension="tga", full_size=False):
+def save_images_to_asm_files(textures_dir, extension, full_size):
     files_in_path = [x for x in os.listdir(textures_dir) if x.endswith(extension)]
     for src_file in files_in_path:
         full_src_file_path = os.path.join(textures_dir, src_file)
