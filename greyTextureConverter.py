@@ -29,6 +29,13 @@ def convert_image_to_asm_code_80x50(input_img, full_size):
     return asm_code_screen_buffer, asm_code_color_buffer
 
 
+def save_images_to_asm_files_80x50(textures_dir, extension, full_size):
+    files_in_path = [x for x in os.listdir(textures_dir) if x.endswith(extension)]
+    for src_file in files_in_path:
+        full_src_file_path = os.path.join(textures_dir, src_file)
+        save_image_to_asm_files_80x50(full_src_file_path, full_size)
+
+
 def save_image_to_asm_files_80x50(file_path, full_size):
     print("Processing {}".format(file_path))
     curr_img = Image.open(file_path)
@@ -37,7 +44,7 @@ def save_image_to_asm_files_80x50(file_path, full_size):
 
     sbf, cbf = convert_image_to_asm_code_80x50(curr_img, full_size)
     sbf_asm_file_path = os.path.join(head, "..", src_file_name) + DST_EXTENSION
-    cbf_asm_file_path = os.path.join(head, "..", src_file_name + "b") + DST_EXTENSION
+    cbf_asm_file_path = os.path.join(head, "..", src_file_name + "_b") + DST_EXTENSION
     with open(sbf_asm_file_path, 'w') as asm_file:
         print("Saving {}...".format(sbf_asm_file_path))
         screen_buffer_output = "\n".join(sbf)
@@ -94,7 +101,7 @@ if __name__ == '__main__':
         if args.single:
             save_image_to_asm_files_80x50(args.path, args.full_size)
         else:
-            print("not available now")
+            save_images_to_asm_files_80x50(args.path, "tga", args.full_size)
     else:
         if args.single:
             save_image_to_asm_files(args.path, args.full_size)
