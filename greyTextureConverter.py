@@ -22,8 +22,8 @@ def convert_image_to_asm_code_80x50(input_img, full_size, key_door_columns):
 
     print("separated: \n{}\n\n{}".format(np.array(screen_buffer_pixels).reshape(13, cols // 2), np.array(color_buffer_pixels).reshape(13, cols // 2)))
 
-    asm_code_screen_buffer = ["\tbyte " + ", ".join(map(str, x)) for x in np.flipud(np.transpose(np.array(screen_buffer_pixels).reshape(13, cols // 2)))]
-    asm_code_color_buffer = ["\tbyte " + ", ".join(map(str, x)) for x in np.flipud(np.transpose(np.array(color_buffer_pixels).reshape(13, cols // 2)))]
+    asm_code_screen_buffer = ["\t.byte " + ", ".join(map(str, x)) for x in np.flipud(np.transpose(np.array(screen_buffer_pixels).reshape(13, cols // 2)))]
+    asm_code_color_buffer = ["\t.byte " + ", ".join(map(str, x)) for x in np.flipud(np.transpose(np.array(color_buffer_pixels).reshape(13, cols // 2)))]
     print(asm_code_screen_buffer)
     print("\n")
     print(asm_code_color_buffer)
@@ -60,7 +60,7 @@ def save_image_to_asm_files_80x50(file_path, full_size, key_door_columns):
 
 def convert_image_to_asm_code(input_img, full_size):
     pixels = np.flipud(np.transpose(np.array(list(input_img.getdata())).reshape((25 if full_size else 13, 16))))
-    asm_code_lines = ["\tbyte " + ", ".join(map(str, x[:13])) for x in pixels]
+    asm_code_lines = ["\t.byte " + ", ".join(map(str, x[:13])) for x in pixels]
     return asm_code_lines
 
 
