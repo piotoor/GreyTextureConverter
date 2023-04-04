@@ -1,4 +1,5 @@
-#! /c/c64dev/projects/textureLoader/venv/Scripts/python.exe
+#!/usr/bin/env python3.10
+
 from PIL import Image
 import numpy as np
 import os
