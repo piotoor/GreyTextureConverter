@@ -17,7 +17,7 @@ def convert_image_to_asm_code_80x50(input_img, full_size, key_door_columns):
 
     for r in range(0,len(pixels), 2):
         for c in range(0, len(pixels[r]), 2):
-            screen_buffer_pixels.append((pixels[r][c] << 4) | pixels[r + 1][c + 1])
+            screen_buffer_pixels.append((pixels[r + 1][c] << 4) | pixels[r + 1][c + 1])
             color_buffer_pixels.append(pixels[r][c + 1])
 
     print("separated: \n{}\n\n{}".format(np.array(screen_buffer_pixels).reshape(13, cols // 2), np.array(color_buffer_pixels).reshape(13, cols // 2)))
