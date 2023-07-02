@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/textureLoader.iml" filepath="$PROJECT_DIR$/.idea/textureLoader.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../GreyTextureConverter/.idea/GreyTextureConverter.iml" filepath="$PROJECT_DIR$/../GreyTextureConverter/.idea/GreyTextureConverter.iml" />
     </modules>
   </component>
 </project>
