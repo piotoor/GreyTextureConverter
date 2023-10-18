@@ -30,9 +30,9 @@ def convert_image_to_asm_code_fli_80x100(input_img):
                 cols_24_31.append((pixels[r][c] << 4) | pixels[r][c + 1])
 
     cols_0_7_asm = ".byte\t" + ",".join(map(str, cols_0_7[0:52])) + "\n.byte\t" + ",".join(map(str, cols_0_7[52:104])) + "\n.byte\t" + ",".join(map(str, cols_0_7[104:156])) + "\n.byte\t" + ",".join(map(str, cols_0_7[156:208]))
-    cols_8_15_asm = ".byte\t" + ",".join(map(str, cols_8_15)) + "\n.byte\t" + ",".join(map(str, cols_8_15[52:104])) + "\n.byte\t" + ",".join(map(str, cols_8_15[104:156])) + "\n.byte\t" + ",".join(map(str, cols_8_15[156:208]))
-    cols_16_23_asm = ".byte\t" + ",".join(map(str, cols_16_23)) + "\n.byte\t" + ",".join(map(str, cols_16_23[52:104])) + "\n.byte\t" + ",".join(map(str, cols_16_23[104:156])) + "\n.byte\t" + ",".join(map(str, cols_16_23[156:208]))
-    cols_24_31_asm = ".byte\t" + ",".join(map(str, cols_24_31)) + "\n.byte\t" + ",".join(map(str, cols_24_31[52:104])) + "\n.byte\t" + ",".join(map(str, cols_24_31[104:156])) + "\n.byte\t" + ",".join(map(str, cols_24_31[156:208]))
+    cols_8_15_asm = ".byte\t" + ",".join(map(str, cols_8_15[0:52])) + "\n.byte\t" + ",".join(map(str, cols_8_15[52:104])) + "\n.byte\t" + ",".join(map(str, cols_8_15[104:156])) + "\n.byte\t" + ",".join(map(str, cols_8_15[156:208]))
+    cols_16_23_asm = ".byte\t" + ",".join(map(str, cols_16_23[0:52])) + "\n.byte\t" + ",".join(map(str, cols_16_23[52:104])) + "\n.byte\t" + ",".join(map(str, cols_16_23[104:156])) + "\n.byte\t" + ",".join(map(str, cols_16_23[156:208]))
+    cols_24_31_asm = ".byte\t" + ",".join(map(str, cols_24_31[0:52])) + "\n.byte\t" + ",".join(map(str, cols_24_31[52:104])) + "\n.byte\t" + ",".join(map(str, cols_24_31[104:156])) + "\n.byte\t" + ",".join(map(str, cols_24_31[156:208]))
 
     print(cols_0_7_asm)
     print()
