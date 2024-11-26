@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.10
+#!/usr/bin/env python3.12
 
 from PIL import Image
 import numpy as np
@@ -6,6 +6,59 @@ import os
 import argparse
 
 DST_EXTENSION = ".asm"
+
+
+def convert_image_to_fli_64x26():
+    curr_img = Image.open("WallJam01b_32x26.tga")
+    cols = 64
+    rows = 26
+    pixels = np.array(list(curr_img.getdata())).reshape((rows, cols))
+    print("pixels raw = {}".format(pixels))
+
+    sr0_pixels = []
+    sr1_pixels = []
+
+    sr0_pixels_2 = []
+    sr1_pixels_2 = []
+
+    for c in range(0, len(pixels[0]), 2):
+        if c < 32:
+            for r in range(0,len(pixels), 2):
+                sr0_pixels.append((pixels[r][c] << 4) | pixels[r][c + 1])
+                sr1_pixels.append((pixels[r + 1][c] << 4) | pixels[r + 1][c + 1])
+        else:
+            for r in range(0,len(pixels), 2):
+                sr0_pixels_2.append((pixels[r][c] << 4) | pixels[r][c + 1])
+                sr1_pixels_2.append((pixels[r + 1][c] << 4) | pixels[r + 1][c + 1])
+
+    print("tex part 1")
+    print(sr0_pixels)
+    print()
+    print(sr1_pixels)
+    print("tex part 2")
+    print(sr0_pixels_2)
+    print()
+    print(sr1_pixels_2)
+
+def convert_image_to_fli_32x26():
+    curr_img = Image.open("WallJam01b_32x26.tga")
+    cols = 32
+    rows = 26
+    pixels = np.array(list(curr_img.getdata())).reshape((rows, cols))
+    print("pixels raw = {}".format(pixels))
+
+    sr0_pixels = []
+    sr1_pixels = []
+
+    for c in range(0, len(pixels[0]), 2):
+        for r in range(0,len(pixels), 2):
+            sr0_pixels.append((pixels[r][c] << 4) | pixels[r][c + 1])
+            sr1_pixels.append((pixels[r + 1][c] << 4) | pixels[r + 1][c + 1])
+
+
+    print(sr0_pixels)
+    print()
+    print(sr1_pixels)
 
 
 def convert_image_to_asm_code_fli_80x100(input_img):
@@ -150,43 +203,159 @@ def save_images_to_asm_files(textures_dir, extension, full_size):
         full_src_file_path = os.path.join(textures_dir, src_file)
         save_image_to_asm_files(full_src_file_path, full_size)
 
+def printsr(sr):
+    ans = "\t.fill 48,0\n"
+    ans += "\t.byte "
+    for x in sr:
+        ans += str(x) + ", "
+
+    return ans[:-2]
+
+
+palette = (0, 0, 0,
+           255, 255, 255,
+           136, 0, 0,
+           170, 255, 238,
+           204, 68, 204,
+           0, 204, 85,
+           0, 0, 170,
+           238, 238, 119,
+           221, 136, 85,
+           102, 68, 0,
+           255, 119, 119,
+           51, 51, 51,
+           119, 119, 119,
+           170, 255, 102,
+           0, 136, 255,
+           187, 187, 187)
+
+palette_4colors = (
+    0, 204, 85,         # 00 d021
+    119, 119, 119,      # 01 d022
+    187, 187, 187,      # 10 d023
+    0, 0, 0             # 11 color ram
+)
+
+def convert_image_to_flat_16x16(path, out_path):
+    curr_img = Image.open(path)
+    curr_img.convert('1')
+    curr_img.show()
+    cols = 16
+    rows = 16
+    pixels = np.array(list(curr_img.getdata())) #.reshape((rows, cols))
+    print(pixels.reshape((rows, cols)))
+    sr = []
+    sr_left = []
+
+    for p in pixels:
+        if p == 0:
+            sr.append(0x00)
+            sr_left.append(0x00)
+        else:
+            sr.append(0x0f)
+            sr_left.append(0xf0)
+    with open("char_mode_" + out_path, 'w') as asm_file:
+        asm_file.write(printsr(sr))
+        asm_file.write("\n")
+    with open("char_mode_left_" + out_path, 'w') as asm_file:
+        asm_file.write(printsr(sr))
+        asm_file.write("\n")
+
+def convert_image_to_fli_32x52(path, out_path, char_mode=False):
+    curr_img = Image.open(path)
+    pal_img = Image.new("P", (1, 1))
+    if char_mode:
+        pal_img.putpalette(palette_4colors + (255, 255, 255) * 240)
+    else:
+        pal_img.putpalette(palette + (255, 255, 255) * 240)
+    curr_img = curr_img.convert("RGB").quantize(palette=pal_img).resize((32, 52))
+    curr_img.show()
+
+    cols = 32
+    rows = 52
+    pixels = np.array(list(curr_img.getdata()))
+    # for x in pixels:
+    #     print(x)
+    pixels = pixels.reshape((rows, cols))
+    # print("pixels raw = {}".format(pixels))
+
+
+    if not char_mode:
+        sr0_pixels = []
+        sr1_pixels = []
+        sr2_pixels = []
+        sr3_pixels = []
+
+        for c in range(0, len(pixels[0]), 2):
+            for r in range(0, len(pixels), 4):
+                sr0_pixels.append((pixels[r][c] << 4) | pixels[r][c + 1])
+                sr1_pixels.append((pixels[r + 1][c] << 4) | pixels[r + 1][c + 1])
+                sr2_pixels.append((pixels[r + 2][c] << 4) | pixels[r + 2][c + 1])
+                sr3_pixels.append((pixels[r + 3][c] << 4) | pixels[r + 3][c + 1])
+
+        with open(out_path, 'w') as asm_file:
+            asm_file.write(printsr(sr0_pixels))
+            asm_file.write("\n")
+            asm_file.write(printsr(sr1_pixels))
+            asm_file.write("\n")
+            asm_file.write(printsr(sr2_pixels))
+            asm_file.write("\n")
+            asm_file.write(printsr(sr3_pixels))
+            asm_file.write("\n")
+    else:
+        sr0_pixels_l = []
+        sr1_pixels_l = []
+        sr2_pixels_l = []
+        sr3_pixels_l = []
+        sr0_pixels_r = []
+        sr1_pixels_r = []
+        sr2_pixels_r = []
+        sr3_pixels_r = []
+
+        for c in range(0, len(pixels[0]), 2):
+            for r in range(0, len(pixels), 4):
+                a = (pixels[r][c] << 2) | pixels[r][c + 1]
+                sr0_pixels_r.append(a)
+                sr0_pixels_l.append(a << 4)
+
+                a = (pixels[r + 1][c] << 2) | pixels[r + 1][c + 1]
+                sr1_pixels_r.append(a)
+                sr1_pixels_l.append(a << 4)
+
+                a = (pixels[r + 2][c] << 2) | pixels[r + 2][c + 1]
+                sr2_pixels_r.append(a)
+                sr2_pixels_l.append(a << 4)
+
+                a = (pixels[r + 3][c] << 2) | pixels[r + 3][c + 1]
+                sr3_pixels_r.append(a)
+                sr3_pixels_l.append(a << 4)
+
+        with open("char_mode_left_" + out_path, 'w') as asm_file:
+            asm_file.write(printsr(sr0_pixels_l))
+            asm_file.write("\n")
+            asm_file.write(printsr(sr1_pixels_l))
+            asm_file.write("\n")
+            asm_file.write(printsr(sr2_pixels_l))
+            asm_file.write("\n")
+            asm_file.write(printsr(sr3_pixels_l))
+            asm_file.write("\n")
+
+        with open("char_mode_right_" + out_path, 'w') as asm_file:
+            asm_file.write(printsr(sr0_pixels_r))
+            asm_file.write("\n")
+            asm_file.write(printsr(sr1_pixels_r))
+            asm_file.write("\n")
+            asm_file.write(printsr(sr2_pixels_r))
+            asm_file.write("\n")
+            asm_file.write(printsr(sr3_pixels_r))
+            asm_file.write("\n")
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-F', '--fli',
-                        required=False,
-                        dest='fli',
-                        action='store_true')
-    parser.add_argument('-q', '--hi-res',
-                        required=False,
-                        dest='hires',
-                        action='store_true')
-    parser.add_argument('-s', '--single-file',
-                        required=False,
-                        dest='single',
-                        action='store_true')
-    parser.add_argument('-f', '--full_size',
-                        required=False,
-                        dest='full_size',
-                        action='store_true')
-    parser.add_argument('path',
-                        type=str)
-    parser.add_argument('-c', '--key-door-columns',
-                        required=False,
-                        action='store_true')
+    parser.add_argument("input_path", type=str)
+    parser.add_argument("output_path", type=str)
     args = parser.parse_args()
-
-    if args.hires:
-        if args.single:
-            save_image_to_asm_files_80x50(args.path, args.full_size, args.key_door_columns)
-        else:
-            save_images_to_asm_files_80x50(args.path, "tga", args.full_size, args.key_door_columns)
-    elif args.fli:
-        save_image_to_asm_files_fli_80x100(args.path)
-    else:
-        if args.single:
-            save_image_to_asm_files(args.path, args.full_size)
-        else:
-            save_images_to_asm_files(args.path, "tga", args.full_size)
-
+    # convert_image_to_fli_32x52(args.input_path, args.output_path, char_mode=True)
+    convert_image_to_flat_16x16(args.input_path, args.output_path)
 
